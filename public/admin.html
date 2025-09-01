@@ -1,0 +1,83 @@
+@'
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin — Parish Check-Ins</title>
+<style>
+  body{font-family:system-ui;margin:20px;background:#f5f6fa;color:#222}
+  input,button{padding:8px;margin:4px}
+  table{border-collapse:collapse;width:100%;margin-top:20px;background:#fff}
+  th,td{border:1px solid #ddd;padding:8px;font-size:.9rem}
+  th{background:#2a4a7b;color:#fff}
+  tr:nth-child(even){background:#f9f9f9}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+  <h1>Parish Admin Dashboard</h1>
+  <p>Enter Admin Password to view submissions:</p>
+  <input type="password" id="pwd" placeholder="Admin Password">
+  <button id="loginBtn">Login</button>
+  <button id="exportBtn" class="hidden">Export CSV</button>
+
+  <table id="dataTbl" class="hidden">
+    <thead>
+      <tr>
+        <th>ID</th><th>Name</th><th>Phone</th><th>Email</th>
+        <th>Household</th><th>Kids</th><th>Timestamp</th><th>Source</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+<script>
+document.getElementById("loginBtn").addEventListener("click", async () => {
+  const pwd = document.getElementById("pwd").value;
+  const resp = await fetch(`/api/submissions?password=${encodeURIComponent(pwd)}`);
+  if (!resp.ok) {
+    alert("Unauthorized or error");
+    return;
+  }
+  const rows = await resp.json();
+  const tbody = document.querySelector("#dataTbl tbody");
+  tbody.innerHTML = "";
+  rows.forEach(r => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${r.id}</td>
+      <td>${r.name}</td>
+      <td>${r.phone||""}</td>
+      <td>${r.email||""}</td>
+      <td>${r.household||""}</td>
+      <td>${r.kids}</td>
+      <td>${r.timestamp}</td>
+      <td>${r.source}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  document.getElementById("dataTbl").classList.remove("hidden");
+  document.getElementById("exportBtn").classList.remove("hidden");
+});
+
+// Export CSV
+document.getElementById("exportBtn").addEventListener("click", () => {
+  let csv = [];
+  document.querySelectorAll("table tr").forEach(tr => {
+    let row = [];
+    tr.querySelectorAll("th,td").forEach(td => row.push(td.innerText));
+    csv.push(row.join(","));
+  });
+  const blob = new Blob([csv.join("\n")], {type:"text/csv"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "submissions.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+</script>
+</body>
+</html>
+'@ | Set-Content -Path .\public\admin.html -Encoding UTF8

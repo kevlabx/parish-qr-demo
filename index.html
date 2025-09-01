@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Parish Check-In (Demo) - Supabase</title>
+<style>
+  :root { --brand:#2a4a7b; }
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0;background:#f6f7fb;color:#111}
+  header{background:var(--brand);color:#fff;padding:14px 18px}
+  .wrap{max-width:720px;margin:18px auto;padding:18px;background:#fff;border-radius:10px;box-shadow:0 6px 24px rgba(10,10,30,.06)}
+  h2{margin:0 0 8px 0}
+  label{display:block;margin-top:10px;font-weight:600}
+  input[type=text],input[type=email]{width:100%;padding:10px;margin-top:6px;border:1px solid #ddd;border-radius:8px}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .row > div{flex:1 1 240px}
+  .btn{display:inline-block;padding:10px 14px;margin-top:14px;border-radius:10px;border:0;background:var(--brand);color:#fff;font-weight:700;cursor:pointer}
+  .muted{color:#666;font-size:.95rem;margin-top:6px}
+  .small{font-size:.9rem;color:#444}
+  footer{font-size:.85rem;color:#666;margin-top:16px;text-align:center}
+  .success{background:#e6ffef;border-left:4px solid #34a853;padding:10px;margin-top:10px;border-radius:8px}
+  .error{background:#fff0f0;border-left:4px solid #d93025;padding:10px;margin-top:10px;border-radius:8px}
+</style>
+</head>
+<body>
+<header><strong>Parish Check-In — DEMO (Supabase)</strong></header>
+<div class="wrap">
+  <h2>Welcome — Optional Check-In</h2>
+  <p class="muted">Scan the QR at the door (or use this page). Your details are private and used for pastoral care/demo only.</p>
+
+  <label for="name">Full name</label>
+  <input id="name" type="text" placeholder="e.g., Maria Sanchez" />
+
+  <div class="row">
+    <div>
+      <label for="phone">Phone (optional)</label>
+      <input id="phone" type="text" placeholder="(optional) phone" />
+    </div>
+    <div>
+      <label for="email">Email (optional)</label>
+      <input id="email" type="email" placeholder="(optional) email" />
+    </div>
+  </div>
+
+  <label for="household">Household (optional)</label>
+  <input id="household" type="text" placeholder="e.g., Sanchez family" />
+
+  <label><input id="kids" type="checkbox" /> Bringing children (they will be added under parent account)</label>
+
+  <label for="door">Door Code (see poster)</label>
+  <input id="door" type="text" placeholder="enter door code printed next to the QR" />
+
+  <button id="submit" class="btn">Check In</button>
+
+  <div id="message" aria-live="polite"></div>
+
+  <p class="small">Demo notes: Door code prevents outside scans. For production we will use rotating QR + short time windows and secure tokens.</p>
+
+  <footer>
+    <small>Prototype — no GPS, no payments. Data stored in Supabase for demo only.</small>
+  </footer>
+</div>
+
+<!-- Supabase client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // === YOUR SUPABASE SETTINGS ===
+  const SUPABASE_URL = 'https://gqnbvktygogtniegzmni.supabase.co'; // your Project URL
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxbmJ2a3R5Z29ndG5pZWd6bW5pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3MzQwODMsImV4cCI6MjA3MjMxMDA4M30.iyuQ6SQr9zodKxS4OlunktFVepkkN7YFwhBMkguYgEk';
+  const DEMO_DOOR_CODE = '1234';
+  // ===============================
+
+  // ✅ Corrected: use global "supabase", not "supabaseJs"
+  const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  const showMsg = (t, cls) => {
+    document.getElementById('message').innerHTML = `<div class="${cls}">${t}</div>`;
+  };
+
+  document.getElementById('submit').addEventListener('click', async () => {
+    const name = document.getElementById('name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const household = document.getElementById('household').value.trim();
+    const kids = document.getElementById('kids').checked;
+    const doorCode = document.getElementById('door').value.trim();
+
+    if (!name) return showMsg('Please type your full name.', 'error');
+    if (!doorCode) return showMsg('Enter the Door Code printed next to the QR.', 'error');
+    if (doorCode !== DEMO_DOOR_CODE) return showMsg('Invalid Door Code', 'error');
+
+    try {
+      const { error } = await client
+        .from('submissions')
+        .insert([{ name, phone, email, household, kids, source: 'qr-demo' }]);
+
+      if (error) {
+        console.error('Supabase insert error', error);
+        return showMsg('Failed to check in. Try the kiosk or ask an usher.', 'error');
+      }
+
+      showMsg('Thanks — you are checked in. Welcome!', 'success');
+      document.getElementById('name').value = '';
+      document.getElementById('phone').value = '';
+      document.getElementById('email').value = '';
+      document.getElementById('kids').checked = false;
+      document.getElementById('door').value = '';
+    } catch (e) {
+      console.error(e);
+      showMsg('Network error. If you are at the church, try the kiosk or ask an usher.', 'error');
+    }
+  });
+</script>
+</body>
+</html>
