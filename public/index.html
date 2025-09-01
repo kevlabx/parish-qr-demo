@@ -3,42 +3,137 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Parish Check-In (Demo) - Supabase</title>
+<title>St. Mary’s Parish Check-In</title>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Open+Sans&display=swap" rel="stylesheet">
+
 <style>
-  :root { --brand:#2a4a7b; }
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0;background:#f6f7fb;color:#111}
-  header{background:var(--brand);color:#fff;padding:14px 18px}
-  .wrap{max-width:720px;margin:18px auto;padding:18px;background:#fff;border-radius:10px;box-shadow:0 6px 24px rgba(10,10,30,.06)}
-  h2{margin:0 0 8px 0}
-  label{display:block;margin-top:10px;font-weight:600}
-  input[type=text],input[type=email]{width:100%;padding:10px;margin-top:6px;border:1px solid #ddd;border-radius:8px}
-  .row{display:flex;gap:10px;flex-wrap:wrap}
+  :root { 
+    --brand:#2a4a7b; 
+    --accent:#c9a227; /* gold */
+    --bg:#fdfcf8;     /* cream background */
+  }
+  body{
+    font-family:'Open Sans',sans-serif;
+    margin:0;
+    background:var(--bg);
+    color:#111;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+  }
+  header{
+    text-align:center;
+    padding:20px;
+  }
+  header img{
+    width:60px;
+    display:block;
+    margin:0 auto 10px auto;
+  }
+  header h1{
+    font-family:'Merriweather',serif;
+    margin:0;
+    color:var(--brand);
+  }
+  header p{
+    font-style:italic;
+    margin:6px 0 0 0;
+    color:#444;
+  }
+  .wrap{
+    max-width:720px;
+    width:100%;
+    margin:18px;
+    padding:24px;
+    background:#fff;
+    border-radius:14px;
+    box-shadow:0 8px 28px rgba(10,10,30,.12);
+  }
+  h2{
+    margin:0 0 12px 0;
+    font-family:'Merriweather',serif;
+    color:var(--brand);
+  }
+  label{
+    display:block;
+    margin-top:12px;
+    font-weight:600;
+  }
+  input[type=text],input[type=email]{
+    width:100%;
+    padding:14px;
+    margin-top:6px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    font-size:1rem;
+  }
+  .row{display:flex;gap:12px;flex-wrap:wrap}
   .row > div{flex:1 1 240px}
-  .btn{display:inline-block;padding:10px 14px;margin-top:14px;border-radius:10px;border:0;background:var(--brand);color:#fff;font-weight:700;cursor:pointer}
+  .btn{
+    display:inline-block;
+    padding:14px 20px;
+    margin-top:18px;
+    border-radius:12px;
+    border:0;
+    background:var(--brand);
+    color:#fff;
+    font-weight:700;
+    font-size:1rem;
+    cursor:pointer;
+    transition:background 0.3s;
+  }
+  .btn:hover{background:#1d3459}
   .muted{color:#666;font-size:.95rem;margin-top:6px}
-  .small{font-size:.9rem;color:#444}
-  footer{font-size:.85rem;color:#666;margin-top:16px;text-align:center}
-  .success{background:#e6ffef;border-left:4px solid #34a853;padding:10px;margin-top:10px;border-radius:8px}
-  .error{background:#fff0f0;border-left:4px solid #d93025;padding:10px;margin-top:10px;border-radius:8px}
+  footer{
+    font-size:.85rem;
+    color:#666;
+    margin-top:20px;
+    text-align:center;
+    line-height:1.4;
+  }
+  .success{
+    background:#e6ffef;
+    border-left:4px solid var(--accent);
+    padding:12px;
+    margin-top:12px;
+    border-radius:8px;
+    font-weight:600;
+    color:#2a4a7b;
+  }
+  .error{
+    background:#fff0f0;
+    border-left:4px solid #d93025;
+    padding:12px;
+    margin-top:12px;
+    border-radius:8px;
+  }
 </style>
 </head>
 <body>
-<header><strong>Parish Check-In — DEMO (Supabase)</strong></header>
 <div class="wrap">
-  <h2>Welcome — Optional Check-In</h2>
-  <p class="muted">Scan the QR at the door (or use this page). Your details are private and used for pastoral care/demo only.</p>
+  <header>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Christian_cross.svg/1200px-Christian_cross.svg.png" alt="Parish Logo">
+    <h1>St. Mary’s Parish Check-In</h1>
+    <p>“For where two or three gather in my name, there am I with them.” — Matthew 18:20</p>
+  </header>
 
-  <label for="name">Full name</label>
+  <h2>Welcome</h2>
+  <p class="muted">Please check in to mark your presence with us today. Your details remain private and secure.</p>
+
+  <label for="name">Your Full Name</label>
   <input id="name" type="text" placeholder="e.g., Maria Sanchez" />
 
   <div class="row">
     <div>
       <label for="phone">Phone (optional)</label>
-      <input id="phone" type="text" placeholder="(optional) phone" />
+      <input id="phone" type="text" placeholder="(optional)" />
     </div>
     <div>
       <label for="email">Email (optional)</label>
-      <input id="email" type="email" placeholder="(optional) email" />
+      <input id="email" type="email" placeholder="(optional)" />
     </div>
   </div>
 
@@ -50,27 +145,24 @@
   <label for="door">Door Code (see poster)</label>
   <input id="door" type="text" placeholder="enter door code printed next to the QR" />
 
-  <button id="submit" class="btn">Check In</button>
+  <button id="submit" class="btn">Mark My Attendance</button>
 
   <div id="message" aria-live="polite"></div>
 
-  <p class="small">Demo notes: Door code prevents outside scans. For production we will use rotating QR + short time windows and secure tokens.</p>
-
   <footer>
-    <small>Prototype — no GPS, no payments. Data stored in Supabase for demo only.</small>
+    <p><em>Faith • Community • Service</em></p>
+    <p>St. Mary’s Parish — Long Beach, CA<br>
+    Contact: (562) 555-1234 | info@stmarys.org</p>
   </footer>
 </div>
 
 <!-- Supabase client -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // === YOUR SUPABASE SETTINGS ===
-  const SUPABASE_URL = 'https://gqnbvktygogtniegzmni.supabase.co'; // your Project URL
+  const SUPABASE_URL = 'https://gqnbvktygogtniegzmni.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxbmJ2a3R5Z29ndG5pZWd6bW5pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3MzQwODMsImV4cCI6MjA3MjMxMDA4M30.iyuQ6SQr9zodKxS4OlunktFVepkkN7YFwhBMkguYgEk';
   const DEMO_DOOR_CODE = '1234';
-  // ===============================
 
-  // ✅ Corrected: use global "supabase", not "supabaseJs"
   const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
   const showMsg = (t, cls) => {
@@ -96,10 +188,10 @@
 
       if (error) {
         console.error('Supabase insert error', error);
-        return showMsg('Failed to check in. Try the kiosk or ask an usher.', 'error');
+        return showMsg('Failed to check in. Please try again.', 'error');
       }
 
-      showMsg('Thanks — you are checked in. Welcome!', 'success');
+      showMsg('🙏 Thank you for joining us today — God bless you!', 'success');
       document.getElementById('name').value = '';
       document.getElementById('phone').value = '';
       document.getElementById('email').value = '';
